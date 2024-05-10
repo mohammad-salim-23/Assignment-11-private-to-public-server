@@ -7,7 +7,7 @@ const port = process.env.PORT||5000;
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ipsrkdy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -29,6 +29,17 @@ async function run() {
       const cursor = foodsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
+    })
+    app.get("/food/:id",async(req,res)=>{
+      try{
+        const id = req.params.id;
+      const query = {_id:new ObjectId(id)};
+      const result = await foodsCollection.findOne(query);
+      res.send(result);
+      }
+      catch(error){
+        console.log(error);
+      }
     })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
