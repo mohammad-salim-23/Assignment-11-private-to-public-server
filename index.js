@@ -34,8 +34,8 @@ async function run() {
         const foodQuery = {_id:new ObjectId(id)};
         const food = await foodsCollection.findOne(foodQuery);
         const updatedFoodQuantity = food.quantity - newOrder.quantity;
-        const updatedPurchaseQuantity = food.
-        purchaseQuantity+newOrder.quantity;
+        const updatedPurchaseQuantity =parseInt( food.
+          purchaseQuantity)+parseInt(newOrder.quantity);
         await foodsCollection.updateOne(foodQuery,
           {
             $set:
