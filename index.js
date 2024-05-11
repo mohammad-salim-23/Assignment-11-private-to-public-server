@@ -75,7 +75,7 @@ async function run() {
         console.log(error);
       }
     })
-    app.get("/myFood/:email",async(req,res)=>{
+    app.get("/food/:email",async(req,res)=>{
       const cursor = foodsCollection.find({email:req.params.email});
       const result = await cursor.toArray();
       res.send(result);
