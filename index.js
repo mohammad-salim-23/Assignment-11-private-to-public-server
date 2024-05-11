@@ -58,6 +58,7 @@ async function run() {
     const result = await foodsCollection.insertOne(newFood);
     res.send(result);
   })
+    
     app.get("/food",async(req,res)=>{
       const cursor = foodsCollection.find();
       const result = await cursor.toArray();
@@ -73,6 +74,11 @@ async function run() {
       catch(error){
         console.log(error);
       }
+    })
+    app.get("/myFood/:email",async(req,res)=>{
+      const cursor = foodsCollection.find({email:req.params.email});
+      const result = await cursor.toArray();
+      res.send(result);
     })
     
     // Send a ping to confirm a successful connection
