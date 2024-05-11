@@ -75,10 +75,34 @@ async function run() {
         console.log(error);
       }
     })
-    app.get("/food/:email",async(req,res)=>{
+    app.get("/myfood/:email",async(req,res)=>{
       const cursor = foodsCollection.find({email:req.params.email});
       const result = await cursor.toArray();
       res.send(result);
+    })
+    // update foodCollections data
+    app.put("/food/:id",async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id:new ObjectId(id)};
+      const options = {upsert:true};
+      const updateFood = req.body;
+      
+      const Food = {
+        $set:{
+          name:updateFood.name,
+          image:updateFood.image,
+          price:updateFood.price,
+          category:updateFood.category,
+          made_by:updateFood.made_by,
+          origin:updateFood.origin,
+          quantity:updateFood.quantity,
+          description:updateFood.description,
+
+        }
+      };
+      const result = await foodsCollection.updateOne(filter,Food,options);
+      res.send(result);
+
     })
     
     // Send a ping to confirm a successful connection
