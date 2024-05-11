@@ -52,6 +52,12 @@ async function run() {
           res.status(500).json({ error: 'Internal Server Error' });
       }
   });
+  // add new food item in foodsCollection
+  app.post("/food",async(req,res)=>{
+    const newFood = req.body;
+    const result = await foodsCollection.insertOne(newFood);
+    res.send(result);
+  })
     app.get("/food",async(req,res)=>{
       const cursor = foodsCollection.find();
       const result = await cursor.toArray();
