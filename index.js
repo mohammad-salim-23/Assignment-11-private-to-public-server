@@ -81,7 +81,12 @@ async function run() {
       res.send(result);
     })
     // get my purchase collection
-    app.get("myPurchase/:email",async(req,res)=>{
+    app.get("/purchase",async(req,res)=>{
+      const cursor = orderCollections.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+    app.get("/myPurchase/:email",async(req,res)=>{
        const cursor = orderCollections.find({email:req.params.email});
        const result = await cursor.toArray();
        res.send(result);
@@ -106,9 +111,21 @@ async function run() {
 
         }
       };
+
       const result = await foodsCollection.updateOne(filter,Food,options);
       res.send(result);
 
+    })
+    app.delete("/purchase/:id",async(req,res)=>{
+      try{
+        const id = req.params.id;
+      const query = {_id:new ObjectId(id)};
+      const result = await orderCollections.deleteOne(query);
+      res.send(result);
+      }
+      catch(error){
+        res.status(500).json({error:"Internal Server Error"})
+      }
     })
     
     // Send a ping to confirm a successful connection
