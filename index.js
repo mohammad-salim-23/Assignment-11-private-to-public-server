@@ -80,6 +80,12 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     })
+    // get my purchase collection
+    app.get("myPurchase/:email",async(req,res)=>{
+       const cursor = orderCollections.find({email:req.params.email});
+       const result = await cursor.toArray();
+       res.send(result);
+    })
     // update foodCollections data
     app.put("/food/:id",async(req,res)=>{
       const id = req.params.id;
