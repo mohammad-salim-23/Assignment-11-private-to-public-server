@@ -25,8 +25,20 @@ async function run() {
     await client.connect();
     const foodsCollection = client.db("foodsDB").collection("foods");
     const orderCollections = client.db("foodsDB").collection("purchase");
+    const galleryCollection = client.db("foodsDB").collection("gallery");
+    // post gallery data
+    app.post("/feedback",async(req,res)=>{
+      const newFeedback = req.body;
+      const result = await galleryCollection.insertOne(newFeedback);
+      res.send(result);
+    })
+    app.get("/feedback",async(req,res)=>{
+      const cursor = galleryCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
     //  customer buy data
-    app.post("/food/:id", async (req, res) => {
+    app.post("/purchase/:id", async (req, res) => {
       try {
           const id = req.params.id;
           const newOrder = req.body;
@@ -116,10 +128,22 @@ async function run() {
       res.send(result);
 
     })
+    app.get("/purchase/:id",async(req,res)=>{
+      try{
+        const id = req.params.id;
+        console.log(id);
+        const query = {_id:new ObjectId(id)};
+        const result = await orderCollections.findOne(query);
+        res.send(result);
+      }
+      catch(error){
+        console.log(error);
+      }
+    })
     app.delete("/purchase/:id",async(req,res)=>{
       try{
         const id = req.params.id;
-      const query = {_id:new ObjectId(id)};
+      const query = {_id:id};
       const result = await orderCollections.deleteOne(query);
       res.send(result);
       }
