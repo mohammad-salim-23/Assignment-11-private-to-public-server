@@ -12,6 +12,24 @@ app.use(cors({
   ],
   credentials:true,
 }));
+// my handmade middleware
+const logger = (req,res,next)=>{
+  console.log("log info.......",req.method,req.url);
+  next();
+}
+const verifyToken=(req,res,next)=>{
+  const token = req?.cookies?.token;
+  if(!token){
+        return res.status(401).send({message:'unAuthorized access'})
+  }
+  jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,decoded)=>{
+    if(err){
+      return res.status(401).send({message:'unauthorized access'})
+    }
+    req.user = decoded;
+    next();
+  })
+}
 app.use(express.json());
 app.use(cookieParser());
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -33,6 +51,21 @@ async function run() {
     const foodsCollection = client.db("foodsDB").collection("foods");
     const orderCollections = client.db("foodsDB").collection("purchase");
     const galleryCollection = client.db("foodsDB").collection("gallery");
+
+    // auth related api
+    app.post('/jwt',logger,async(req,res)=>{
+      const user = req.body;
+      console.log('user for token',user);
+      const token = jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1h'})
+        res
+        .cookie('token',token,{
+          httpOnly:true,
+          secure:true,
+          sameSite:'none'
+        })
+        .send({success:true})
+      
+    })
     // post gallery data
     app.post("/feedback",async(req,res)=>{
       const newFeedback = req.body;
