@@ -8,7 +8,7 @@ const port = process.env.PORT||5000;
 // middleware
 app.use(cors({
   origin:[
-    'http://localhost:5173/'
+    'http://localhost:5173'
   ],
   credentials:true,
 }));
@@ -66,6 +66,12 @@ async function run() {
         .send({success:true})
       
     })
+    app.post('/logout',async(req,res)=>{
+      const user = req.body;
+      console.log('logging out',user);
+      res.clearCookie('token',{maxAge:'0'})
+      .send({success:true})
+    })
     // post gallery data
     app.post("/feedback",async(req,res)=>{
       const newFeedback = req.body;
@@ -78,7 +84,7 @@ async function run() {
       res.send(result);
     })
     //  customer buy data
-    app.post("/purchase/:id", async (req, res) => {
+    app.post("/purchase/:id",verifyToken, async (req, res) => {
       try {
           const id = req.params.id;
           const newOrder = req.body;
@@ -127,18 +133,19 @@ async function run() {
         console.log(error);
       }
     })
-    app.get("/myfood/:email",async(req,res)=>{
+    app.get("/myfood/:email",verifyToken,async(req,res)=>{
       const cursor = foodsCollection.find({email:req.params.email});
+      console.log(req.user);
       const result = await cursor.toArray();
       res.send(result);
     })
     // get my purchase collection
-    app.get("/purchase",async(req,res)=>{
+    app.get("/purchase",verifyToken,async(req,res)=>{
       const cursor = orderCollections.find();
       const result = await cursor.toArray();
       res.send(result);
     })
-    app.get("/myPurchase/:email",async(req,res)=>{
+    app.get("/myPurchase/:email",verifyToken,async(req,res)=>{
        const cursor = orderCollections.find({email:req.params.email});
        const result = await cursor.toArray();
        res.send(result);
