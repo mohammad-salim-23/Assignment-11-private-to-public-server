@@ -1,3 +1,4 @@
+
 const express = require('express')
 const cors = require("cors");
 require("dotenv").config();
@@ -8,10 +9,17 @@ const port = process.env.PORT||5000;
 // middleware
 app.use(cors({
   origin:[
-    'http://localhost:5173'
+    'http://localhost:5173',
+    "https://assignment-11-client-1d064.web.app",
+    "https://assignment-11-client-1d064.firebaseapp.com"
   ],
   credentials:true,
 }));
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+};
 // my handmade middleware
 const logger = (req,res,next)=>{
   console.log("log info.......",req.method,req.url);
@@ -47,7 +55,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const foodsCollection = client.db("foodsDB").collection("foods");
     const orderCollections = client.db("foodsDB").collection("purchase");
     const galleryCollection = client.db("foodsDB").collection("gallery");
@@ -84,7 +92,7 @@ async function run() {
       res.send(result);
     })
     //  customer buy data
-    app.post("/purchase/:id",verifyToken, async (req, res) => {
+    app.post("/purchase/:id", async (req, res) => {
       try {
           const id = req.params.id;
           const newOrder = req.body;
@@ -145,7 +153,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     })
-    app.get("/myPurchase/:email",verifyToken,async(req,res)=>{
+    app.get("/myPurchase/:email",async(req,res)=>{
        const cursor = orderCollections.find({email:req.params.email});
        const result = await cursor.toArray();
        res.send(result);
@@ -200,7 +208,7 @@ async function run() {
     })
     
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
